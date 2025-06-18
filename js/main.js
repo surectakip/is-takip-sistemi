@@ -44,3 +44,61 @@ async function initializeApp() {
 }
 
 window.onload = initializeApp;
+async function loadData() {
+  const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3FYXQ_1zy1ldlWNkZ73O8RLVbE0QgFOfdZoR6ZP6Ay-D_YH2uuiptRtSXSJIQekxOkbWp0l8BGNT4/pub?output=csv';
+
+  const loadingEl = document.getElementById('loading');
+  const theadEl = document.getElementById('table-head');
+  const tbodyEl = document.getElementById('table-body');
+  const recordCountEl = document.getElementById('record-count');
+  const selResp = document.getElementById('filter-responsible');
+  const selStat = document.getElementById('filter-status');
+  const selPrio = document.getElementById('filter-priority');
+  const qHead = document.getElementById('query-head');
+  const qBody = document.getElementById('query-body');
+
+  let allRows = [], headers = [];
+
+  if (loadingEl) loadingEl.style.display = 'flex';
+
+  try {
+    const res = await fetch(sheetUrl);
+    const text = await res.text();
+    const rows = text.trim().split('\n').map(r => r.split(','));
+    headers = rows.shift();
+    allRows = rows;
+
+    theadEl.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+    tbodyEl.innerHTML = allRows.map(row => {
+      const statusClass = getStatusClass(row[6]);
+      return `<tr>` + row.map((cell, i) =>
+        i === 6
+          ? `<td><span class="status-badge ${statusClass}">${cell}</span></td>`
+          : `<td>${cell}</td>`
+      ).join('') + `</tr>`;
+    }).join('');
+
+    recordCountEl.textContent = `${allRows.length} kayıt`;
+    [selResp, selStat, selPrio].forEach((s, i) => {
+      if (!s) return;
+      const idx = [3, 6, 7][i];
+      const values = [...new Set(allRows.map(r => r[idx]))].sort();
+      s.innerHTML = '<option value="">Tümü</option>' + values.map(v => `<option>${v}</option>`).join('');
+    });
+
+    qHead.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+    qBody.innerHTML = ''; // Sorgu kısmı filtreyle dolacak
+  } catch (err) {
+    recordCountEl.textContent = 'Veri alınamadı';
+    recordCountEl.style.color = '#e53e3e';
+  } finally {
+    if (loadingEl) loadingEl.style.display = 'none';
+  }
+}
+
+function getStatusClass(statusText) {
+  const status = (statusText || '').toLowerCase();
+  if (status.includes('tamam')) return 'status-completed';
+  if (status.includes('devam')) return 'status-inprogress';
+  return 'status-pending';
+}
