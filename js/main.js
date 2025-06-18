@@ -1,15 +1,13 @@
-// HTML parçaları yüklendikten sonra sekmeleri ve veriyi hazırla
 async function loadHTML(id, file) {
   const res = await fetch(file);
   const html = await res.text();
   document.getElementById(id).innerHTML = html;
 }
 
-// Sekmeleri aktif et ve event'leri bağla
 async function initializeApp() {
   const tabIds = ['entry', 'results', 'data', 'query', 'edit', 'charts'];
 
-  // Tüm içerikleri yükle
+  // HTML modüllerini sırayla yükle
   await Promise.all([
     loadHTML('navbar', 'components/navbar.html'),
     loadHTML('tab-entry', 'components/tab-entry.html'),
@@ -20,22 +18,28 @@ async function initializeApp() {
     loadHTML('tab-charts', 'components/tab-charts.html'),
   ]);
 
-  // Sekme geçişlerini bağla
+  // Sekme düğmelerine tıklama olaylarını bağla
   tabIds.forEach(t => {
     const btn = document.getElementById('btn-' + t);
     const tab = document.getElementById('tab-' + t);
+
     if (btn && tab) {
-      btn.onclick = () => {
+      btn.addEventListener('click', () => {
+        // Tüm sekmeleri gizle, sadece ilgili olanı göster
         tabIds.forEach(x => {
           document.getElementById('btn-' + x)?.classList.toggle('active', x === t);
           document.getElementById('tab-' + x)?.classList.toggle('active', x === t);
         });
-        if (t === 'data') loadData();
-      };
+
+        // Sadece 'Takip' sekmesine geçince loadData çağrılır
+        if (t === 'data') {
+          loadData(); // hata burada oluşuyordu
+        }
+      });
     }
   });
 
-  // Varsayılan sekme: giriş
+  // Giriş sekmesini varsayılan olarak başlat
   document.getElementById('btn-entry')?.click();
 }
 
