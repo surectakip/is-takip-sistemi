@@ -1,0 +1,38 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>İş - Süreç Takip</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="navbar"></div>
+  <div id="tab-entry"></div>
+  <div id="tab-results"></div>
+  <div id="tab-data"></div>
+  <div id="tab-query"></div>
+  <div id="tab-edit"></div>
+  <div id="tab-charts"></div>
+
+  <script>
+    async function loadHTML(id, file) {
+      const res = await fetch(file);
+      const html = await res.text();
+      document.getElementById(id).innerHTML = html;
+    }
+
+    window.onload = () => {
+      loadHTML('navbar', 'components/navbar.html');
+      loadHTML('tab-entry', 'components/tab-entry.html');
+      loadHTML('tab-results', 'components/tab-results.html');
+      loadHTML('tab-data', 'components/tab-data.html');
+      loadHTML('tab-query', 'components/tab-query.html');
+      loadHTML('tab-edit', 'components/tab-edit.html');
+      loadHTML('tab-charts', 'components/tab-charts.html');
+    };
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>

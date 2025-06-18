@@ -1,0 +1,63 @@
+<div id="tab-query" class="tab">
+  <div class="query-container">
+    <h1>İş Takip Sorgu</h1>
+
+    <div class="filter-card">
+      <div class="filter-header">
+        <h3>Filtreleme Seçenekleri</h3>
+      </div>
+
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label>Sorumlu</label>
+          <select id="filter-responsible" class="filter-select">
+            <option value="">Tümü</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Durum</label>
+          <select id="filter-status" class="filter-select">
+            <option value="">Tümü</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Öncelik</label>
+          <select id="filter-priority" class="filter-select">
+            <option value="">Tümü</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Başlangıç Tarihi (Min)</label>
+          <input type="date" id="filter-start-from" class="filter-input">
+        </div>
+
+        <div class="filter-group">
+          <label>Başlangıç Tarihi (Max)</label>
+          <input type="date" id="filter-start-to" class="filter-input">
+        </div>
+
+        <div class="filter-group">
+          <label>Anahtar Kelime</label>
+          <input type="text" id="filter-text" placeholder="Arama yapın..." class="filter-input">
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button id="apply-btn" class="filter-btn primary">Filtrele</button>
+        <button id="reset-btn" class="filter-btn danger">Temizle</button>
+      </div>
+    </div>
+
+    <div class="results-info" id="results-info"></div>
+
+    <div class="table-scroll">
+      <table id="query-table">
+        <thead id="query-head"></thead>
+        <tbody id="query-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
