@@ -1,49 +1,12 @@
-async function loadHTML(id, file) {
-  const res = await fetch(file);
-  const html = await res.text();
-  document.getElementById(id).innerHTML = html;
+// 1. Yardımcı fonksiyon
+function getStatusClass(statusText) {
+  const status = (statusText || '').toLowerCase();
+  if (status.includes('tamam')) return 'status-completed';
+  if (status.includes('devam')) return 'status-inprogress';
+  return 'status-pending';
 }
 
-async function initializeApp() {
-  const tabIds = ['entry', 'results', 'data', 'query', 'edit', 'charts'];
-
-  // HTML modüllerini sırayla yükle
-  await Promise.all([
-    loadHTML('navbar', 'components/navbar.html'),
-    loadHTML('tab-entry', 'components/tab-entry.html'),
-    loadHTML('tab-results', 'components/tab-results.html'),
-    loadHTML('tab-data', 'components/tab-data.html'),
-    loadHTML('tab-query', 'components/tab-query.html'),
-    loadHTML('tab-edit', 'components/tab-edit.html'),
-    loadHTML('tab-charts', 'components/tab-charts.html'),
-  ]);
-
-  // Sekme düğmelerine tıklama olaylarını bağla
-  tabIds.forEach(t => {
-    const btn = document.getElementById('btn-' + t);
-    const tab = document.getElementById('tab-' + t);
-
-    if (btn && tab) {
-      btn.addEventListener('click', () => {
-        // Tüm sekmeleri gizle, sadece ilgili olanı göster
-        tabIds.forEach(x => {
-          document.getElementById('btn-' + x)?.classList.toggle('active', x === t);
-          document.getElementById('tab-' + x)?.classList.toggle('active', x === t);
-        });
-
-        // Sadece 'Takip' sekmesine geçince loadData çağrılır
-        if (t === 'data') {
-          loadData(); // hata burada oluşuyordu
-        }
-      });
-    }
-  });
-
-  // Giriş sekmesini varsayılan olarak başlat
-  document.getElementById('btn-entry')?.click();
-}
-
-window.onload = initializeApp;
+// 2. Veri yükleme fonksiyonu
 async function loadData() {
   const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3FYXQ_1zy1ldlWNkZ73O8RLVbE0QgFOfdZoR6ZP6Ay-D_YH2uuiptRtSXSJIQekxOkbWp0l8BGNT4/pub?output=csv';
 
@@ -87,7 +50,7 @@ async function loadData() {
     });
 
     qHead.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
-    qBody.innerHTML = ''; // Sorgu kısmı filtreyle dolacak
+    qBody.innerHTML = '';
   } catch (err) {
     recordCountEl.textContent = 'Veri alınamadı';
     recordCountEl.style.color = '#e53e3e';
@@ -96,9 +59,42 @@ async function loadData() {
   }
 }
 
-function getStatusClass(statusText) {
-  const status = (statusText || '').toLowerCase();
-  if (status.includes('tamam')) return 'status-completed';
-  if (status.includes('devam')) return 'status-inprogress';
-  return 'status-pending';
+// 3. HTML parça yükleyici
+async function loadHTML(id, file) {
+  const res = await fetch(file);
+  const html = await res.text();
+  document.getElementById(id).innerHTML = html;
 }
+
+// 4. Uygulamayı başlat
+async function initializeApp() {
+  const tabIds = ['entry', 'results', 'data', 'query', 'edit', 'charts'];
+
+  await Promise.all([
+    loadHTML('navbar', 'components/navbar.html'),
+    loadHTML('tab-entry', 'components/tab-entry.html'),
+    loadHTML('tab-results', 'components/tab-results.html'),
+    loadHTML('tab-data', 'components/tab-data.html'),
+    loadHTML('tab-query', 'components/tab-query.html'),
+    loadHTML('tab-edit', 'components/tab-edit.html'),
+    loadHTML('tab-charts', 'components/tab-charts.html'),
+  ]);
+
+  tabIds.forEach(t => {
+    const btn = document.getElementById('btn-' + t);
+    const tab = document.getElementById('tab-' + t);
+    if (btn && tab) {
+      btn.addEventListener('click', () => {
+        tabIds.forEach(x => {
+          document.getElementById('btn-' + x)?.classList.toggle('active', x === t);
+          document.getElementById('tab-' + x)?.classList.toggle('active', x === t);
+        });
+        if (t === 'data') loadData();
+      });
+    }
+  });
+
+  document.getElementById('btn-entry')?.click();
+}
+
+window.onload = initializeApp;
